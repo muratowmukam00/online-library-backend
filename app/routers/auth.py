@@ -1,10 +1,15 @@
 import os
+from typing import Optional
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
+
+from app.core.security import  verify_password, create_access_token
+from app.schemas.token import Token
 
 from app.core.database import SessionLocal
 from app.models.user import User
@@ -42,3 +47,12 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
     return new_user
 
+
+@router.post("/login", response_model=Token)
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    # noinspection PyTypeChecker
+    user: Optional[User] = db.query(User).filter(User.username == form_data.username).first()
+    if user is None or not verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail='Invalid credentials')
+    access_token = create_access_token(data={"sub": user.username})
+    return {"access_token": access_token, "token_type": "bearer"}
