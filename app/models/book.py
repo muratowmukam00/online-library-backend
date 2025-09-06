@@ -12,6 +12,6 @@ class Book(Base):
     category_id = Column(Integer, ForeignKey("categories.id"))
     file_path = Column(String, nullable=False)
 
-    autor = relationship("Author", back_populates="books")
+    author = relationship("Author", back_populates="books")
     category = relationship("Category", back_populates="books")
 

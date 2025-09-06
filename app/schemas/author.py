@@ -11,5 +11,6 @@ class AuthorUpdate(AuthorBase):
 
 class AuthorResponse(AuthorBase):
     id: int
+
     class Config:
         from_attributes = True
