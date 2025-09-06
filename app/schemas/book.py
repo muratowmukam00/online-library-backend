@@ -10,6 +10,12 @@ class BookBase(BaseModel):
 class BookCreate(BookBase):
     pass
 
+class BookResponse(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = None
+    author_id: int
+
 class BookUpdate(BookBase):
     id: int
     file_path: Optional[str] = None
