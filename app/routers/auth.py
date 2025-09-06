@@ -10,8 +10,8 @@ from sqlalchemy import or_
 
 from app.core.security import  verify_password, create_access_token
 from app.schemas.token import Token
+from app.core.database import get_db
 
-from app.core.database import SessionLocal
 from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse
 
@@ -22,12 +22,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 router = APIRouter(tags=["auth"])
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+
 
 @router.post("/register", response_model=UserResponse)
 def register(user: UserCreate, db: Session = Depends(get_db)):

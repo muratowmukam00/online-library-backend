@@ -3,13 +3,13 @@ from pydantic import BaseModel
 class CategoryBase(BaseModel):
     name: str
 
-class AuthorCreate(CategoryBase):
+class CategoryCreate(CategoryBase):
     pass
 
-class AuthorUpdate(CategoryBase):
+class CategoryUpdate(CategoryBase):
     pass
 
-class AuthorResponse(CategoryBase):
+class CategoryResponse(CategoryBase):
     id: int
 
     class Config:
