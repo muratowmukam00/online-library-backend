@@ -12,13 +12,17 @@ class BookCreate(BookBase):
 
 class BookResponse(BaseModel):
     id: int
+    file_path: Optional[str] = None
     title: str
     description: Optional[str] = None
     author_id: int
+    category_id: int
+
+    class Config:
+        from_attributes = True
 
 class BookUpdate(BookBase):
-    id: int
-    file_path: Optional[str] = None
+
 
     class Config:
         from_attributes = True

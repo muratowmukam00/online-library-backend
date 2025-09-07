@@ -6,7 +6,6 @@ from app.core.database import get_db
 from app.core.security import get_current_admin
 
 from app.models.category import Category
-from app.routers.author import public_router
 from app.schemas.category import CategoryCreate, CategoryResponse, CategoryUpdate
 
 public_router = APIRouter(
@@ -70,6 +69,7 @@ def delete_category(*, db: Session = Depends(get_db), category_id: int):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
     db.delete(category_to_delete)
     db.commit()
+
     return
 
 

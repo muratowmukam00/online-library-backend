@@ -19,7 +19,8 @@ app.include_router(category.public_router, tags=["public"])
 app.include_router(author.admin_router, prefix="/admin", tags=["author"])
 app.include_router(author.public_router, tags=["author"])
 
-app.include_router(book.router, prefix="/admin", tags=["book"])
+app.include_router(book.admin_router, prefix="/admin", tags=["book"])
+app.include_router(book.public_router, tags=["book"])
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
