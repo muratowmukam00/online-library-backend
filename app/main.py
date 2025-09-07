@@ -13,8 +13,12 @@ app.include_router(admin_setup.router, prefix="/admin-setup" ,tags=["admin_setup
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(user.router, prefix="/users", tags=["users"])
 
-app.include_router(category.router, prefix="/admin", tags=["category"])
-app.include_router(author.router, prefix="/admin", tags=["author"])
+app.include_router(category.admin_router, prefix="/admin", tags=["category"])
+app.include_router(category.public_router, tags=["public"])
+
+app.include_router(author.admin_router, prefix="/admin", tags=["author"])
+app.include_router(author.public_router, tags=["author"])
+
 app.include_router(book.router, prefix="/admin", tags=["book"])
 
 if __name__ == "__main__":
