@@ -8,8 +8,8 @@ class Book(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     description = Column(Text, nullable=False)
-    author_id = Column(Integer, ForeignKey("authors.id"))
-    category_id = Column(Integer, ForeignKey("categories.id"))
+    author_id = Column(Integer, ForeignKey("authors.id", ondelete="SET NULL"), nullable=True)
+    category_id = Column(Integer, ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
     file_path = Column(String, nullable=False)
 
     author = relationship("Author", back_populates="books")

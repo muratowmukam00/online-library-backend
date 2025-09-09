@@ -1,6 +1,5 @@
 import shutil
 import os
-from http.client import HTTPResponse
 from typing import Optional, List
 
 from fastapi import APIRouter,Depends, status, HTTPException, File, UploadFile, Form
@@ -40,7 +39,7 @@ def get_book(*, db: Session = Depends(get_db), book_id: int):
     return book
 
 
-@admin_router.post("/", response_model=BookResponse, status_code=status.HTTP_201_CREATED)
+@admin_router.post("", response_model=BookResponse, status_code=status.HTTP_201_CREATED)
 def create_book(
         *,
         db: Session = Depends(get_db),
@@ -110,9 +109,13 @@ def update_book(
         category_id: Optional[int] = Form(None),
         file: UploadFile = File(None),
 ):
+    old_title = None
     book = db.query(Book).filter(Book.id == book_id).first()
     if not book:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found")
+
+    old_file_path = book.file_path
+
     if title and title != book.title:
         existing_book = db.query(Book).filter(Book.title == title).first()
         if existing_book:
@@ -120,6 +123,7 @@ def update_book(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Book with this title already exists",
             )
+        old_title = book.title
         book.title = title
 
     if description is not None:
@@ -137,8 +141,8 @@ def update_book(
                 detail="Only PDF files are allowed",
             )
 
-        if os.path.exists(book.file_path):
-            os.remove(book.file_path)
+        if os.path.exists(old_file_path):
+            os.remove(old_file_path)
 
         unique_filename = f"{book.title.replace(' ', '_')}_{book.author_id}.{file_extension}"
         file_path = os.path.join('files', unique_filename)
@@ -147,6 +151,16 @@ def update_book(
             shutil.copyfileobj(file.file, f)
         book.file_path = file_path
 
+    # Если файл не был обновлен, но изменился title, обновляем имя файла
+    elif title and title != old_title:  # old_title нужно сохранить
+        file_extension = book.file_path.split(".")[-1]
+        unique_filename = f"{book.title.replace(' ', '_')}_{book.author_id}.{file_extension}"
+        new_file_path = os.path.join('files', unique_filename)
+
+        # Переименовываем файл
+        if os.path.exists(book.file_path):
+            os.rename(book.file_path, new_file_path)
+            book.file_path = new_file_path
     db.add(book)
     db.commit()
     db.refresh(book)
@@ -157,6 +171,8 @@ def delete_book(*, db: Session = Depends(get_db), book_id: int):
     book = db.query(Book).filter(Book.id == book_id).first()
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
+    with open(book.file_path, "rb") as f:
+        os.remove(book.file_path)
     db.delete(book)
     db.commit()
 
